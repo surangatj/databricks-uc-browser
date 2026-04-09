@@ -62,8 +62,10 @@ A **Unity Catalog Browser** — a React + FastAPI app that lets users:
 2. View table schema (columns, types, nullability)
 3. Run SQL queries and see results — all as themselves
 
-![App Screenshot](docs/images/app-screenshot.png)
+![App Screenshot](docs/images/app-main.png)
 *The Unity Catalog Browser — showing the catalog tree on the left, table schema in the center, and SQL query results at the bottom.*
+
+> **Screenshot needed**: Take a screenshot of the running app at `https://uc-catalog-browser-7474643844809599.aws.databricksapps.com` and save as `docs/images/app-main.png`
 
 ---
 
@@ -276,8 +278,10 @@ export default defineConfig({
 
 The app uses a 3-panel layout: sidebar (catalog tree) + table schema viewer + SQL query panel.
 
-![Catalog Tree](docs/images/catalog-tree.png)
+![Catalog Tree](docs/images/app-catalog-tree.png)
 *The sidebar shows catalogs → schemas → tables in a lazy-loading tree. Click a table to load its schema.*
+
+> **Screenshot needed**: Expand `transportation > gold` and click `fact_trips`. Save as `docs/images/app-catalog-tree.png`
 
 The API client (`api.ts`) uses relative URLs so it works in both production (same origin) and local dev (Vite proxy):
 
@@ -291,8 +295,10 @@ export const api = {
 }
 ```
 
-![Query Results](docs/images/query-results.png)
+![Query Results](docs/images/app-query-results.png)
 *Running a SQL query — results appear in a scrollable table. Press ⌘+Enter to run.*
+
+> **Screenshot needed**: Run `SELECT * FROM transportation.gold.fact_trips LIMIT 10` and save as `docs/images/app-query-results.png`
 
 ---
 
@@ -302,10 +308,14 @@ This is a **one-time admin step** per workspace.
 
 1. Go to your Databricks workspace
 2. Click your username (top right) → **Previews**
-3. Find **"On-Behalf-Of User Authorization"** and toggle it **ON**
 
-![OBO Preview Toggle](docs/images/obo-preview.png)
-*The Previews panel — toggle "On-Behalf-Of User Authorization" to enable OBO for the workspace.*
+![Step 1 — Open the user menu and click Previews](docs/images/step1-user-menu-previews.png)
+*Click your workspace name / avatar in the top-right corner, then select **Previews** from the dropdown.*
+
+3. Search for **"databricks app"** and toggle **"On-Behalf-Of User Authorization"** to **ON**
+
+![Step 2 — The OBO toggle in the Previews panel](docs/images/step2-obo-toggle.png)
+*The Previews panel — find "Databricks Apps - On-Behalf-Of User Authorization" and toggle it ON. Changes take effect in a few minutes.*
 
 > Must be done in every workspace (dev, staging, production separately).
 
@@ -354,8 +364,15 @@ databricks bundle run -t dev uc_browser
 
 When a new user opens the app, they'll see a consent screen:
 
-![Consent Screen](docs/images/consent-screen.png)
-*The one-time OBO consent screen — users authorize the app to act on their behalf. This only appears once per user.*
+![Step 3 — OBO consent screen](docs/images/step3-obo-consent-screen.png)
+*The one-time consent screen — the app (`uc-catalog-browser`) is requesting permission to act on the user's behalf.*
+
+Clicking **"Databricks SQL"** expands the scope detail before authorizing:
+
+![Step 4 — Expanded scope detail](docs/images/step4-obo-authorized.png)
+*Expanding the scope shows exactly what access the app is requesting: execute SQL and manage SQL-related resources. Click **Authorize** to proceed.*
+
+This only appears once per user per app. After consent the user lands directly in the app — no login, no credentials, no setup.
 
 This is expected and normal. After consent, the user lands in the app with their own UC permissions applied to every query.
 
