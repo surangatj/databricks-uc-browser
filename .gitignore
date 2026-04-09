@@ -10,8 +10,9 @@ venv/
 node_modules/
 dist/
 
-# Databricks — built React output is NOT committed (build in CI)
-apps/*/static/
+# Node build output (keep out of git; CI builds it fresh, local deploy needs it present)
+# Note: static/ is committed so databricks bundle deploy (which respects .gitignore) picks it up
+# The GitHub Actions workflow rebuilds it before deploying anyway
 
 # Databricks CLI state
 .databricks/
