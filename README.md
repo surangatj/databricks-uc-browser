@@ -71,30 +71,7 @@ A **Unity Catalog Browser** — a React + FastAPI app that lets users:
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Databricks Apps Runtime                  │
-│                                                             │
-│  ┌─────────────┐    ┌──────────────────────────────────┐   │
-│  │   React UI  │───▶│         FastAPI Backend           │   │
-│  │  (Vite/TS)  │    │  - /api/catalogs                  │   │
-│  │  Tailwind   │    │  - /api/.../schemas               │   │
-│  └─────────────┘    │  - /api/.../tables                │   │
-│   Built to static/  │  - /api/query                     │   │
-│                     │  - Serves React static files      │   │
-│                     └──────────────┬───────────────────┘   │
-│                                    │ WorkspaceClient        │
-│                                    │ token = X-Forwarded-   │
-│                                    │         Access-Token   │
-└────────────────────────────────────┼────────────────────────┘
-                                     │
-                    ┌────────────────▼─────────────────┐
-                    │         Unity Catalog             │
-                    │  - Statement Execution API        │
-                    │  - Catalogs / Schemas / Tables    │
-                    │  - Enforces user permissions      │
-                    └──────────────────────────────────┘
-```
+![Architecture — Unity Catalog Browser OBO Auth Flow](docs/images/architecture.gif)
 
 ### Key design decisions
 
