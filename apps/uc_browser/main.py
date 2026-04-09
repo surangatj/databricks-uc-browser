@@ -229,8 +229,12 @@ _BLOCKED_PREFIXES = (
 )
 
 
+class QueryRequest(BaseModel):
+    sql: str
+
+
 @app.post("/api/query")
-def run_query(body: "QueryRequest", request: Request):
+def run_query(body: QueryRequest, request: Request):
     """Execute a SELECT statement and return results."""
     token = user_token_from(request)
     sql_upper = body.sql.strip().upper()
@@ -244,10 +248,6 @@ def run_query(body: "QueryRequest", request: Request):
 
     columns, rows = run_sql(body.sql.strip(), token)
     return {"columns": columns, "rows": rows, "row_count": len(rows)}
-
-
-class QueryRequest(BaseModel):
-    sql: str
 
 
 # ---------------------------------------------------------------------------

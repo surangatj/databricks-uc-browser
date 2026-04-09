@@ -26,11 +26,20 @@ export interface QueryResult {
   row_count: number
 }
 
+function extractError(detail: unknown, fallback: string): string {
+  if (typeof detail === 'string') return detail
+  // FastAPI 422 validation errors: detail is an array of {loc, msg, type}
+  if (Array.isArray(detail)) {
+    return detail.map((d: { msg?: string }) => d?.msg ?? String(d)).join('; ')
+  }
+  return fallback
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(path)
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error((err as { detail: string }).detail || res.statusText)
+    throw new Error(extractError((err as { detail: unknown }).detail, res.statusText))
   }
   return res.json() as Promise<T>
 }
@@ -43,7 +52,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error((err as { detail: string }).detail || res.statusText)
+    throw new Error(extractError((err as { detail: unknown }).detail, res.statusText))
   }
   return res.json() as Promise<T>
 }
