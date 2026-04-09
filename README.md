@@ -1,6 +1,6 @@
-# Build a Databricks App with React + FastAPI — No Service Principals, No PATs, No Secrets
+# Build a Databricks App with React + FastAPI - No Service Principals, No PATs, No Secrets
 
-> **A complete tutorial for building a production-ready Databricks App that queries Unity Catalog as the logged-in user — zero credential management required.**
+> **A complete tutorial for building a production-ready Databricks App that queries Unity Catalog as the logged-in user - zero credential management required.**
 
 ---
 
@@ -10,7 +10,7 @@ You've built a great analytics app. You deploy it to Databricks Apps. Then the q
 
 - *"Which service principal should the app use?"*
 - *"How do we rotate the PAT every 90 days?"*
-- *"User A can see table X — but the app's SP can see everything. How do we enforce UC permissions?"*
+- *"User A can see table X - but the app's SP can see everything. How do we enforce UC permissions?"*
 - *"The secret scope expired again. Who manages that?"*
 
 The traditional approach looks like this:
@@ -46,24 +46,24 @@ User → Databricks Proxy (SSO) → App → Unity Catalog
 ```
 
 The result:
-- ✅ Every query runs as the user — UC row filters, column masks, and permissions all apply
+- ✅ Every query runs as the user - UC row filters, column masks, and permissions all apply
 - ✅ No service principal needed (or you can remove it)
 - ✅ No PAT rotation, no secret scopes
-- ✅ First-time users see a one-time consent screen — then it just works
+- ✅ First-time users see a one-time consent screen - then it just works
 - ✅ Different users see different data based on their own grants
 
 ---
 
 ## What We're Building
 
-A **Unity Catalog Browser** — a React + FastAPI app that lets users:
+A **Unity Catalog Browser** - a React + FastAPI app that lets users:
 
 1. Browse all catalogs, schemas, and tables they have access to
 2. View table schema (columns, types, nullability)
-3. Run SQL queries and see results — all as themselves
+3. Run SQL queries and see results - all as themselves
 
 ![App Screenshot](docs/images/app-main.png)
-*The Unity Catalog Browser — showing the catalog tree on the left, table schema in the center, and SQL query results at the bottom.*
+*The Unity Catalog Browser - showing the catalog tree on the left, table schema in the center, and SQL query results at the bottom.*
 
 > **Screenshot needed**: Take a screenshot of the running app at `https://uc-catalog-browser-7474643844809599.aws.databricksapps.com` and save as `docs/images/app-main.png`
 
@@ -71,7 +71,7 @@ A **Unity Catalog Browser** — a React + FastAPI app that lets users:
 
 ## Architecture
 
-![Architecture — Unity Catalog Browser OBO Auth Flow](docs/images/architecture.gif)
+![Architecture - Unity Catalog Browser OBO Auth Flow](docs/images/architecture.gif)
 
 ### Key design decisions
 
@@ -81,14 +81,14 @@ A **Unity Catalog Browser** — a React + FastAPI app that lets users:
 | **React + Vite + Tailwind** | Fast builds, TypeScript safety, no CSS framework bloat |
 | **OBO over SP auth** | Zero credential management, UC permissions respected per user |
 | **DAB (Asset Bundles)** | One command to deploy to any environment |
-| **Static build in `static/`** | Keeps `package.json` out of the uploaded source (critical — see gotchas) |
+| **Static build in `static/`** | Keeps `package.json` out of the uploaded source (critical - see gotchas) |
 
 ---
 
 ## Prerequisites
 
 - Databricks workspace with **Unity Catalog** enabled
-- Workspace **admin** access (to enable the OBO Preview feature — one-time setup)
+- Workspace **admin** access (to enable the OBO Preview feature - one-time setup)
 - [Databricks CLI v0.200+](https://docs.databricks.com/dev-tools/cli/install.html)
 - Node.js 18+ and npm
 - Python 3.10+
@@ -99,7 +99,7 @@ A **Unity Catalog Browser** — a React + FastAPI app that lets users:
 
 ```
 databricks-uc-browser/
-├── databricks.yml                  # DAB config — workspace, targets, app resource
+├── databricks.yml                  # DAB config - workspace, targets, app resource
 ├── .gitignore                      # Excludes apps/*/static/ (built output)
 ├── .github/
 │   └── workflows/
@@ -113,7 +113,7 @@ databricks-uc-browser/
         ├── static/                 # Built React output (gitignored, built in CI)
         │   ├── index.html
         │   └── assets/
-        └── frontend/               # React source — NOT uploaded to Databricks
+        └── frontend/               # React source - NOT uploaded to Databricks
             ├── package.json
             ├── vite.config.ts      # outDir: '../static' ← critical setting
             ├── tailwind.config.js
@@ -131,7 +131,7 @@ databricks-uc-browser/
 
 ## Step-by-Step Implementation
 
-### Step 1 — Configure the DAB bundle
+### Step 1 - Configure the DAB bundle
 
 `databricks.yml` registers the app with your workspace:
 
@@ -151,7 +151,7 @@ resources:
   apps:
     uc_browser:
       name: "uc-catalog-browser"
-      description: "Unity Catalog browser — runs SQL as the logged-in user"
+      description: "Unity Catalog browser - runs SQL as the logged-in user"
       source_code_path: ./apps/uc_browser
       user_api_scopes:
         - sql          # ← This is what enables OBO with SQL access
@@ -161,7 +161,7 @@ resources:
 
 ---
 
-### Step 2 — The FastAPI backend
+### Step 2 - The FastAPI backend
 
 The heart of the OBO pattern is in `main.py`. Here's the auth flow:
 
@@ -172,7 +172,7 @@ def user_token_from(request: Request) -> Optional[str]:
 
 def get_client(user_token: Optional[str] = None) -> WorkspaceClient:
     if user_token:
-        # auth_type="pat" is CRITICAL — without it, the SDK sees both the OBO
+        # auth_type="pat" is CRITICAL - without it, the SDK sees both the OBO
         # token AND the SP credentials in env vars and throws:
         # "more than one authorization method configured: oauth and pat"
         return WorkspaceClient(host=_HOST, token=user_token, auth_type="pat")
@@ -225,7 +225,7 @@ def serve_spa(full_path: str = ""):
 
 ---
 
-### Step 3 — The .databricksignore trick
+### Step 3 - The .databricksignore trick
 
 This is the most important gotcha. If `package.json` is present in the uploaded source, Databricks Apps detects it and runs `npm install` at startup. This causes the "Preparing source code" step to **hang indefinitely** until it times out.
 
@@ -251,7 +251,7 @@ export default defineConfig({
 
 ---
 
-### Step 4 — The React frontend
+### Step 4 - The React frontend
 
 The app uses a 3-panel layout: sidebar (catalog tree) + table schema viewer + SQL query panel.
 
@@ -273,32 +273,32 @@ export const api = {
 ```
 
 ![Query Results](docs/images/app-query-results.png)
-*Running a SQL query — results appear in a scrollable table. Press ⌘+Enter to run.*
+*Running a SQL query - results appear in a scrollable table. Press ⌘+Enter to run.*
 
 > **Screenshot needed**: Run `SELECT * FROM transportation.gold.fact_trips LIMIT 10` and save as `docs/images/app-query-results.png`
 
 ---
 
-### Step 5 — Enable On-Behalf-Of in your workspace
+### Step 5 - Enable On-Behalf-Of in your workspace
 
 This is a **one-time admin step** per workspace.
 
 1. Go to your Databricks workspace
 2. Click your username (top right) → **Previews**
 
-![Step 1 — Open the user menu and click Previews](docs/images/step1-user-menu-previews.png)
+![Step 1 - Open the user menu and click Previews](docs/images/step1-user-menu-previews.png)
 *Click your workspace name / avatar in the top-right corner, then select **Previews** from the dropdown.*
 
 3. Search for **"databricks app"** and toggle **"On-Behalf-Of User Authorization"** to **ON**
 
-![Step 2 — The OBO toggle in the Previews panel](docs/images/step2-obo-toggle.png)
-*The Previews panel — find "Databricks Apps - On-Behalf-Of User Authorization" and toggle it ON. Changes take effect in a few minutes.*
+![Step 2 - The OBO toggle in the Previews panel](docs/images/step2-obo-toggle.png)
+*The Previews panel - find "Databricks Apps - On-Behalf-Of User Authorization" and toggle it ON. Changes take effect in a few minutes.*
 
 > Must be done in every workspace (dev, staging, production separately).
 
 ---
 
-### Step 6 — Deploy
+### Step 6 - Deploy
 
 **First time setup:**
 
@@ -323,7 +323,7 @@ databricks bundle deploy -t dev
 databricks bundle run -t dev uc_browser
 ```
 
-**After first deploy — critical steps:**
+**After first deploy - critical steps:**
 
 ```bash
 # Stop the app (required to pick up new token scopes)
@@ -337,19 +337,19 @@ databricks bundle run -t dev uc_browser
 
 ---
 
-### Step 7 — First-time user consent
+### Step 7 - First-time user consent
 
 When a new user opens the app, they'll see a consent screen:
 
-![Step 3 — OBO consent screen](docs/images/step3-obo-consent-screen.png)
-*The one-time consent screen — the app (`uc-catalog-browser`) is requesting permission to act on the user's behalf.*
+![Step 3 - OBO consent screen](docs/images/step3-obo-consent-screen.png)
+*The one-time consent screen - the app (`uc-catalog-browser`) is requesting permission to act on the user's behalf.*
 
 Clicking **"Databricks SQL"** expands the scope detail before authorizing:
 
-![Step 4 — Expanded scope detail](docs/images/step4-obo-authorized.png)
+![Step 4 - Expanded scope detail](docs/images/step4-obo-authorized.png)
 *Expanding the scope shows exactly what access the app is requesting: execute SQL and manage SQL-related resources. Click **Authorize** to proceed.*
 
-This only appears once per user per app. After consent the user lands directly in the app — no login, no credentials, no setup.
+This only appears once per user per app. After consent the user lands directly in the app - no login, no credentials, no setup.
 
 This is expected and normal. After consent, the user lands in the app with their own UC permissions applied to every query.
 
