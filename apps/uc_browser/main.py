@@ -1,6 +1,9 @@
 """
 Unity Catalog Browser — FastAPI backend
 Auth: Databricks Apps On-Behalf-Of (OBO) — queries run as the logged-in user
+
+All catalog/schema/table browsing uses SQL (SHOW CATALOGS, SHOW SCHEMAS, etc.)
+so only the 'sql' OBO scope is needed — no unity-catalog SDK scope required.
 """
 import os
 import logging
@@ -27,10 +30,10 @@ _warehouse_id: Optional[str] = None
 
 def get_client(user_token: Optional[str] = None) -> WorkspaceClient:
     """
-    Return a WorkspaceClient.
-    When OBO is active the user's OAuth token is passed; auth_type="pat" tells
-    the SDK to use ONLY this token and ignore the SP credentials in env vars
-    (otherwise it throws "more than one authorization method configured").
+    Return a WorkspaceClient using the OBO token when available.
+    auth_type="pat" prevents the SDK from throwing
+    "more than one authorization method configured" when both the OBO token
+    and the SP credentials (DATABRICKS_CLIENT_ID/SECRET) are present.
     """
     if user_token:
         return WorkspaceClient(host=_HOST, token=user_token, auth_type="pat")
@@ -50,13 +53,11 @@ def get_warehouse_id(client: Optional[WorkspaceClient] = None) -> str:
     global _warehouse_id
     if _warehouse_id:
         return _warehouse_id
-    # Allow override via env var
     from_env = os.environ.get("DATABRICKS_WAREHOUSE_ID", "").strip()
     if from_env:
         _warehouse_id = from_env
         logger.info(f"Using warehouse from env: {_warehouse_id}")
         return _warehouse_id
-    # Auto-discover first available warehouse
     w = client or get_client()
     for wh in w.warehouses.list():
         if wh.id:
@@ -67,10 +68,14 @@ def get_warehouse_id(client: Optional[WorkspaceClient] = None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# SQL execution
+# SQL execution helper
 # ---------------------------------------------------------------------------
 
-def execute_sql(statement: str, user_token: Optional[str] = None):
+def run_sql(statement: str, user_token: Optional[str] = None) -> tuple[list[str], list[list]]:
+    """
+    Execute a SQL statement and return (columns, rows).
+    Uses the OBO token so Unity Catalog enforces the user's own permissions.
+    """
     w = get_client(user_token)
     warehouse_id = get_warehouse_id(w)
     result = w.statement_execution.execute_statement(
@@ -83,7 +88,13 @@ def execute_sql(statement: str, user_token: Optional[str] = None):
             status_code=400,
             detail=f"SQL error: {result.status.error.message}",
         )
-    return result
+    columns: list[str] = []
+    rows: list[list] = []
+    if result.manifest and result.manifest.schema and result.manifest.schema.columns:
+        columns = [col.name or "" for col in result.manifest.schema.columns]
+    if result.result and result.result.data_array:
+        rows = result.result.data_array
+    return columns, rows
 
 
 # ---------------------------------------------------------------------------
@@ -92,7 +103,7 @@ def execute_sql(statement: str, user_token: Optional[str] = None):
 
 app = FastAPI(title="Unity Catalog Browser", version="1.0.0")
 
-# Allow CORS for local development (Vite dev server on :5173)
+# CORS for local Vite dev server
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -103,14 +114,13 @@ app.add_middleware(
 
 STATIC_DIR = Path(__file__).parent / "static"
 
-# IMPORTANT: mount static assets BEFORE the catch-all route.
-# If the catch-all is registered first, /assets/... requests are intercepted.
+# Mount static assets BEFORE the catch-all route
 if (STATIC_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
 
 
 # ---------------------------------------------------------------------------
-# API routes
+# API routes — all UC browsing via SQL (only 'sql' OBO scope needed)
 # ---------------------------------------------------------------------------
 
 @app.get("/api/me")
@@ -123,91 +133,98 @@ def get_me(request: Request):
 
 @app.get("/api/catalogs")
 def list_catalogs(request: Request):
-    """List all Unity Catalog catalogs the user has access to."""
+    """List all catalogs the user can see via SHOW CATALOGS."""
     token = user_token_from(request)
-    w = get_client(token)
     try:
-        catalogs = sorted(c.name for c in w.catalogs.list() if c.name)
+        _, rows = run_sql("SHOW CATALOGS", token)
+        # SHOW CATALOGS returns: catalog (col 0)
+        catalogs = sorted(r[0] for r in rows if r and r[0])
         return {"catalogs": catalogs}
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"list_catalogs error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/catalogs/{catalog}/schemas")
 def list_schemas(catalog: str, request: Request):
-    """List schemas within a catalog."""
+    """List schemas in a catalog via SHOW SCHEMAS."""
     token = user_token_from(request)
-    w = get_client(token)
     try:
-        schemas = sorted(s.name for s in w.schemas.list(catalog_name=catalog) if s.name)
+        _, rows = run_sql(f"SHOW SCHEMAS IN `{catalog}`", token)
+        # SHOW SCHEMAS returns: databaseName (col 0)
+        schemas = sorted(r[0] for r in rows if r and r[0])
         return {"schemas": schemas}
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"list_schemas error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/catalogs/{catalog}/schemas/{schema}/tables")
 def list_tables(catalog: str, schema: str, request: Request):
-    """List tables and views within a schema."""
+    """List tables and views via SHOW TABLES."""
     token = user_token_from(request)
-    w = get_client(token)
     try:
-        tables = sorted(t.name for t in w.tables.list(catalog_name=catalog, schema_name=schema) if t.name)
+        _, rows = run_sql(f"SHOW TABLES IN `{catalog}`.`{schema}`", token)
+        # SHOW TABLES returns: namespace, tableName, isTemporary
+        tables = sorted(r[1] for r in rows if r and len(r) > 1 and r[1])
         return {"tables": tables}
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"list_tables error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/catalogs/{catalog}/schemas/{schema}/tables/{table}")
 def get_table_detail(catalog: str, schema: str, table: str, request: Request):
-    """Return column schema and a 10-row sample for a table."""
+    """Return column schema via DESCRIBE TABLE and a 10-row sample."""
     token = user_token_from(request)
-    w = get_client(token)
 
-    # Column schema via Unity Catalog API
+    # Column schema via DESCRIBE TABLE
     try:
-        table_info = w.tables.get(full_name=f"{catalog}.{schema}.{table}")
+        _, rows = run_sql(
+            f"DESCRIBE TABLE `{catalog}`.`{schema}`.`{table}`", token
+        )
         columns = []
-        if table_info.columns:
-            columns = [
-                {
-                    "name": col.name,
-                    "type": col.type_text or str(col.type_name),
-                    "nullable": col.nullable if col.nullable is not None else True,
-                }
-                for col in table_info.columns
-            ]
+        for r in rows:
+            if not r or not r[0]:
+                break  # DESCRIBE TABLE has a blank separator before partitioning info
+            col_name = r[0]
+            col_type = r[1] if len(r) > 1 else ""
+            if col_name.startswith("#"):
+                break  # partition/detail section starts
+            columns.append({"name": col_name, "type": col_type, "nullable": True})
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get table info: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to describe table: {e}")
 
-    # 10-row sample (best-effort — user may not have SELECT)
+    # 10-row sample (best-effort)
     sample_rows: list = []
     try:
-        result = execute_sql(
-            f"SELECT * FROM `{catalog}`.`{schema}`.`{table}` LIMIT 10",
-            token,
+        _, sample_rows = run_sql(
+            f"SELECT * FROM `{catalog}`.`{schema}`.`{table}` LIMIT 10", token
         )
-        if result.result and result.result.data_array:
-            sample_rows = result.result.data_array
     except Exception:
-        pass  # sample is optional
+        pass
 
     return {"columns": columns, "sample_rows": sample_rows}
 
 
-class QueryRequest(BaseModel):
-    sql: str
+# ---------------------------------------------------------------------------
+# SQL query endpoint
+# ---------------------------------------------------------------------------
 
-
-# Simple allowlist — only SELECT statements
-_BLOCKED_PREFIXES = ("DROP ", "DELETE ", "TRUNCATE ", "ALTER ", "INSERT ", "UPDATE ", "MERGE ", "CREATE ", "REPLACE ")
+_BLOCKED_PREFIXES = (
+    "DROP ", "DELETE ", "TRUNCATE ", "ALTER ",
+    "INSERT ", "UPDATE ", "MERGE ", "CREATE ", "REPLACE ",
+)
 
 
 @app.post("/api/query")
-def run_query(body: QueryRequest, request: Request):
-    """Execute a SQL statement and return results (SELECT only)."""
+def run_query(body: "QueryRequest", request: Request):
+    """Execute a SELECT statement and return results."""
     token = user_token_from(request)
     sql_upper = body.sql.strip().upper()
 
@@ -215,20 +232,15 @@ def run_query(body: QueryRequest, request: Request):
         if sql_upper.startswith(prefix):
             raise HTTPException(
                 status_code=400,
-                detail=f"Only SELECT statements are allowed. Blocked keyword: {prefix.strip()}",
+                detail=f"Only SELECT statements are allowed. Blocked: {prefix.strip()}",
             )
 
-    result = execute_sql(body.sql.strip(), token)
-
-    columns: list[str] = []
-    rows: list = []
-
-    if result.manifest and result.manifest.schema and result.manifest.schema.columns:
-        columns = [col.name or "" for col in result.manifest.schema.columns]
-    if result.result and result.result.data_array:
-        rows = result.result.data_array
-
+    columns, rows = run_sql(body.sql.strip(), token)
     return {"columns": columns, "rows": rows, "row_count": len(rows)}
+
+
+class QueryRequest(BaseModel):
+    sql: str
 
 
 # ---------------------------------------------------------------------------
@@ -237,7 +249,6 @@ def run_query(body: QueryRequest, request: Request):
 
 @app.get("/{full_path:path}", response_class=HTMLResponse, include_in_schema=False)
 def serve_spa(full_path: str = ""):
-    """Serve the React SPA for every non-API route."""
     index_path = STATIC_DIR / "index.html"
     if not index_path.exists():
         return HTMLResponse(
@@ -257,6 +268,5 @@ def serve_spa(full_path: str = ""):
 
 if __name__ == "__main__":
     import uvicorn
-
     port = int(os.environ.get("UVICORN_PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, log_level="info")
