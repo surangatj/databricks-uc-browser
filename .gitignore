@@ -23,6 +23,10 @@ dist/
 !.env.example
 *.local
 
+# Generated documents
+docs/*.docx
+docs/*.html
+
 # macOS
 .DS_Store
 
