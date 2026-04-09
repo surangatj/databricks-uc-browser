@@ -1,0 +1,19 @@
+bundle:
+  name: uc_browser_bundle
+
+workspace:
+  host: https://dbc-9600f2d1-ae25.cloud.databricks.com
+
+targets:
+  dev:
+    default: true
+    mode: development
+
+resources:
+  apps:
+    uc_browser:
+      name: "uc-catalog-browser"
+      description: "Browse Unity Catalog tables and run SQL queries as yourself — no service principals, no PATs"
+      source_code_path: ./apps/uc_browser
+      user_api_scopes:
+        - sql

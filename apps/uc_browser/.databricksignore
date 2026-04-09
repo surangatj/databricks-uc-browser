@@ -1,0 +1,2 @@
+# Exclude React source — we only upload the built output in static/
+frontend/

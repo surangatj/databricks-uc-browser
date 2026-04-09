@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# Databricks — built React output is NOT committed (build in CI)
+apps/*/static/
+
+# Databricks CLI state
+.databricks/
+
+# Environment files
+.env
+.env.*
+*.local
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
