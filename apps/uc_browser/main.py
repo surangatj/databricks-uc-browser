@@ -75,6 +75,8 @@ def run_sql(statement: str, user_token: Optional[str] = None) -> tuple[list[str]
     """
     Execute a SQL statement and return (columns, rows).
     Uses the OBO token so Unity Catalog enforces the user's own permissions.
+    All cell values are normalized to str | None so the frontend never
+    receives SDK objects that render as [object Object].
     """
     w = get_client(user_token)
     warehouse_id = get_warehouse_id(w)
@@ -93,7 +95,12 @@ def run_sql(statement: str, user_token: Optional[str] = None) -> tuple[list[str]
     if result.manifest and result.manifest.schema and result.manifest.schema.columns:
         columns = [col.name or "" for col in result.manifest.schema.columns]
     if result.result and result.result.data_array:
-        rows = result.result.data_array
+        # Normalize every cell to str | None — the SDK may return ints, floats,
+        # or other non-string types depending on column type.
+        rows = [
+            [str(cell) if cell is not None else None for cell in row]
+            for row in result.result.data_array
+        ]
     return columns, rows
 
 
