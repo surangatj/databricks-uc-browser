@@ -1,0 +1,188 @@
+<mxfile host="app.diagrams.net" version="24.0.0">
+  <diagram name="OBO Architecture" id="databricks-obo-arch">
+    <mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="1" background="#1B3139">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TITLE -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Unity Catalog Browser — On-Behalf-Of Authentication" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#FFFFFF;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="327" y="30" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="subtitle" value="No Service Principals · No PATs · No Secret Rotation · Users bring their own permissions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#5F8FA3;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="327" y="68" width="1000" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- USER -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="user-icon" value="" style="shape=mxgraph.cisco.users.user;fillColor=#4A90D9;strokeColor=#2A70B9;fontColor=#FFFFFF;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="280" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="user-label" value="User" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="65" y="370" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="user-sub" value="SSO / Azure AD / SAML" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#5F8FA3;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="45" y="388" width="130" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- DATABRICKS PROXY -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="proxy-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3A1A10;strokeColor=#FF3621;strokeWidth=2;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="260" y="240" width="150" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-icon" value="" style="shape=mxgraph.cisco.security.lock;fillColor=#FF3621;strokeColor=#FF3621;" vertex="1" parent="1">
+          <mxGeometry x="300" y="258" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-label" value="Databricks Proxy" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="265" y="338" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-sub" value="Authenticates users · Injects OBO token" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FF7055;fontSize=9;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="255" y="356" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- DATABRICKS APP CONTAINER (dashed group) -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="app-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D2535;strokeColor=#2E6A82;strokeWidth=2;dashed=1;dashPattern=8 4;arcSize=6;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="500" y="200" width="400" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="app-container-label" value="Databricks App Container" style="text;html=1;strokeColor=none;fillColor=#0D2535;align=left;fontColor=#2E6A82;fontStyle=1;fontSize=10;fontFamily=Helvetica;spacingLeft=8;labelBorderColor=none;" vertex="1" parent="1">
+          <mxGeometry x="514" y="193" width="210" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- REACT -->
+        <mxCell id="react-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D3348;strokeColor=#00B4D8;strokeWidth=2;arcSize=14;" vertex="1" parent="1">
+          <mxGeometry x="522" y="222" width="150" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="react-icon" value="" style="shape=mxgraph.azure.react;fillColor=#00B4D8;strokeColor=#00B4D8;" vertex="1" parent="1">
+          <mxGeometry x="562" y="240" width="70" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="react-label" value="React UI" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="527" y="314" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="react-sub" value="Vite · TypeScript&#xa;Tailwind CSS" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#5BBDD4;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="527" y="334" width="140" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="react-badge" value="Port 5173 (dev)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#063348;strokeColor=#00B4D8;fontColor=#00B4D8;fontSize=9;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="547" y="376" width="100" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- FASTAPI -->
+        <mxCell id="fastapi-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#063330;strokeColor=#00A972;strokeWidth=2;arcSize=14;" vertex="1" parent="1">
+          <mxGeometry x="724" y="222" width="150" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi-icon" value="" style="shape=mxgraph.aws4.lambda;fillColor=#00A972;strokeColor=#00A972;" vertex="1" parent="1">
+          <mxGeometry x="763" y="240" width="70" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi-label" value="FastAPI" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="729" y="314" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi-sub" value="Python · Uvicorn&#xa;OBO Token Reader" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#4DC49A;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="729" y="334" width="140" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi-badge" value="Port 8000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#031D1C;strokeColor=#00A972;fontColor=#00A972;fontSize=9;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="749" y="376" width="100" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- SQL WAREHOUSE -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="warehouse-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A0A2A;strokeColor=#9B5DE5;strokeWidth=2;arcSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="160" width="150" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="warehouse-icon" value="" style="shape=mxgraph.cisco.computers_and_peripherals.pc;fillColor=#9B5DE5;strokeColor=#9B5DE5;" vertex="1" parent="1">
+          <mxGeometry x="1048" y="178" width="74" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="warehouse-label" value="SQL Warehouse" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="256" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="warehouse-sub" value="Auto-discovered&#xa;Statement Execution API" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#A875E8;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="276" width="140" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="warehouse-badge" value="Serverless / Pro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0F0518;strokeColor=#9B5DE5;fontColor=#9B5DE5;fontSize=9;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1035" y="318" width="100" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- UNITY CATALOG -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="uc-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2A1F0A;strokeColor=#FF9B21;strokeWidth=2;arcSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="400" width="150" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-icon" value="" style="shape=mxgraph.cisco.storage.storage_server;fillColor=#FF9B21;strokeColor=#FF9B21;" vertex="1" parent="1">
+          <mxGeometry x="1048" y="418" width="74" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-label" value="Unity Catalog" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFFFFF;fontStyle=1;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="496" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-sub" value="transportation.gold&#xa;fact_trips" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#FFA940;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="516" width="140" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-badge" value="Enforces user permissions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A1205;strokeColor=#FF9B21;fontColor=#FF9B21;fontSize=9;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="1018" y="558" width="114" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ARROWS -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <!-- User → Proxy (HTTPS / SSO) -->
+        <mxCell id="arrow-user-proxy" value="HTTPS · SSO Login" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#FF3621;strokeWidth=2;fontColor=#FF7055;fontSize=10;fontFamily=Helvetica;fontStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="user-icon" target="proxy-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Proxy → App (X-Forwarded-Access-Token) -->
+        <mxCell id="arrow-proxy-app" value="X-Forwarded-Access-Token" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#FF3621;strokeWidth=2.5;fontColor=#FF3621;fontSize=10;fontFamily=Helvetica;fontStyle=3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="proxy-box" target="react-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- React → FastAPI (/api/*) -->
+        <mxCell id="arrow-react-fastapi" value="REST API /api/*" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#00B4D8;strokeWidth=2;fontColor=#00B4D8;fontSize=10;fontFamily=Helvetica;fontStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="react-box" target="fastapi-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → Warehouse -->
+        <mxCell id="arrow-fastapi-wh" value="Statement Execution API&#xa;(user OBO token)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#9B5DE5;strokeWidth=2;fontColor=#A875E8;fontSize=10;fontFamily=Helvetica;fontStyle=1;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="fastapi-box" target="warehouse-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → UC (SHOW / DESCRIBE) -->
+        <mxCell id="arrow-fastapi-uc" value="SHOW CATALOGS · SHOW TABLES&#xa;DESCRIBE TABLE · SELECT *" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#FF9B21;strokeWidth=2;fontColor=#FFA940;fontSize=10;fontFamily=Helvetica;fontStyle=1;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="fastapi-box" target="uc-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Warehouse ↔ UC -->
+        <mxCell id="arrow-wh-uc" value="Executes as user" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#5F8FA3;strokeWidth=1.5;dashed=1;dashPattern=6 3;fontColor=#5F8FA3;fontSize=9;fontFamily=Helvetica;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeRounding=4;" edge="1" source="warehouse-box" target="uc-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- OBO CALLOUT BOX -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="obo-callout" value="&lt;b style=&quot;color:#FF3621;&quot;&gt;OBO Enabled&lt;/b&gt; (Workspace Preview)&lt;br/&gt;&lt;span style=&quot;color:#5F8FA3;font-size:10px;&quot;&gt;Workspace → username → Previews&lt;br/&gt;Toggle: On-Behalf-Of User Authorization&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A0A06;strokeColor=#FF3621;strokeWidth=1.5;fontColor=#FFFFFF;fontSize=11;fontFamily=Helvetica;align=left;spacingLeft=10;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="200" y="470" width="260" height="72" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- KEY CODE CALLOUT -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="code-callout" value="&lt;b style=&quot;color:#00A972;&quot;&gt;Key Pattern&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-family:Courier New;font-size:9px;color:#AAAAAA;&quot;&gt;WorkspaceClient(&lt;br/&gt;  host=HOST,&lt;br/&gt;  token=obo_token,&lt;br/&gt;  auth_type=&amp;quot;pat&amp;quot;  # critical!&lt;br/&gt;)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#031D1C;strokeColor=#00A972;strokeWidth=1.5;fontColor=#FFFFFF;fontSize=11;fontFamily=Helvetica;align=left;spacingLeft=10;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="520" y="470" width="220" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- FOOTER NOTE -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <mxCell id="footer" value="github.com/surangatj/databricks-uc-browser  ·  Built with Databricks Apps + DAB  ·  FastAPI + React + On-Behalf-Of Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontColor=#2E4A56;fontSize=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="327" y="620" width="1000" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
