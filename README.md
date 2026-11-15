@@ -92,7 +92,9 @@ databricks-uc-browser/
 │           ├── App.tsx
 │           ├── api.ts
 │           └── components/
-└── .github/workflows/deploy.yml    # Build + deploy on push to main
+└── .github/workflows/
+    ├── ci.yml                      # Build check on every push and pull request
+    └── deploy.yml                  # Build + deploy, started by hand from the Actions tab
 ```
 
 ---
